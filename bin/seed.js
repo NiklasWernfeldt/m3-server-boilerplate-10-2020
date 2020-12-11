@@ -3,11 +3,13 @@ const Book = require('./../models/book.model');
 const Bookmark = require('./../models/bookmark.model');
 const User = require('./../models/user.model');
 const Page = require('./../models/page.model');
+const PublicBooks = require('./../models/publicbooks.model');
 
 const books = require('./books-mock-data');
 const users = require('./users-mock-data');
 const bookmarks = require('./bookmarks-mock-data');
 const pages = require('./pages-mock-data');
+const publicbooks = require('./publicbooks-mock-data');
 
 const DB_NAME = 'bookway-seed';
 
@@ -104,21 +106,9 @@ mongoose
 
     const bigPromise = Promise.all(prs);
     return bigPromise;
-/*
-    console.log(`Created ${createdPages.length} pages`)
-
-    const addedPages = books.map( ( bookObj, i) => {
-      const pageObj = createdPages[i];
-      bookObj.pages = [ pageObj._id ];
-
-      return bookObj;
-    })
-
-    return addedPages */
 
 
-
-  // CLOSE THE DB CONNECTION
+ 
 })
 .then((updatedBooks) => {
  const prs = updatedBooks.map((book) => {
@@ -129,10 +119,17 @@ mongoose
   })
 
   return Promise.all(prs)
-  console.log(updatedBooks)
   
   })
   .then(() => {
+    // create the publicbooks field in the database
+    const pr = PublicBooks.create(publicbooks)
+    return pr
+
+    
+  })
+  .then(() => {
+     // CLOSE THE DB CONNECTION
     mongoose.connection.close(); // MOVE THIS FUTHER DOWN
   })
 

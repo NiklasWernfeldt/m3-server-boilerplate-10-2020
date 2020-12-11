@@ -10,14 +10,19 @@ const cors = require('cors');
 require('dotenv').config();
 
 const authRouter = require('./routes/auth.router');
-
-
+const startRouter = require('./routes/start.router');
+ const dashboardRouter = require("./routes/dashboard.router")
+ const bookRouter = require("./routes/book.router")
+ const booksRouter = require("./routes/books.router")
+const authorRouter = require("./routes/author.router")
+// const writeboardRouter = require("./routes/writeboard.router")
 // MONGOOSE CONNECTION
 mongoose
   .connect(process.env.MONGODB_URI, {
     keepAlive: true,
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useFindAndModify: false
   })
   .then(() => console.log(`Connected to database`))
   .catch((err) => console.error(err));
@@ -60,6 +65,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ROUTER MIDDLEWARE
 app.use('/auth', authRouter);
+ app.use("/api/dashboard", dashboardRouter)
+ // app.use('/api/writeboard', writeboardRouter);
+app.use('/api/books', booksRouter);
+app.use('/api/author', authorRouter);
+ app.use('/api/book', bookRouter);
+app.use('/api/startpage', startRouter);
+
 
 
 
