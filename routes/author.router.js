@@ -12,6 +12,7 @@ const {
 router.get("/:id" , isLoggedIn, (req, res, next) => {
     const authorId = req.params.id
    User.findById(authorId)
+   .populate("ownBooks")
    .then((user) => {
        res.status(200).json({user})
    })

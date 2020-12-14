@@ -16,6 +16,8 @@ const {
 router.get("/:id" , isLoggedIn, (req, res, next) => {
     const bookId = req.params.id
    Book.findById(bookId)
+   .populate("author")
+   .populate("pages")
    .then((book) => {
        res.status(200).json({book: book})
    })
@@ -91,13 +93,6 @@ router.post("/upload/:bookid", (req, res, next) => {
   })
   .catch((err) => next(createError(err)))
 })
-/*
-const {bookid} = req.params
-  PublicBooks.create({books: bookid})
-  .then((publishedBook) => {
-    res.status(200).json({publishedBook})
-  })
-  .catch((err) => next(createError(err)))
-*/
+
 module.exports = router
 

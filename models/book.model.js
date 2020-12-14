@@ -7,7 +7,7 @@ const bookSchema = new Schema({
     genre: {type: String, required: true},
     views: {type: Number},
     earnedCash: {type: Number},
-    coverImage: {type: String, required: true},
+    coverImage: {type: String}, // change it to required
     pages: [{type: Schema.Types.ObjectId, ref: "Page"}],
     author: {type: Schema.Types.ObjectId, ref: "User"} 
 }, {

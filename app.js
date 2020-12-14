@@ -15,6 +15,7 @@ const startRouter = require('./routes/start.router');
  const bookRouter = require("./routes/book.router")
  const booksRouter = require("./routes/books.router")
 const authorRouter = require("./routes/author.router")
+const userRouter = require("./routes/user.router")
 // const writeboardRouter = require("./routes/writeboard.router")
 // MONGOOSE CONNECTION
 mongoose
@@ -71,6 +72,8 @@ app.use('/api/books', booksRouter);
 app.use('/api/author', authorRouter);
  app.use('/api/book', bookRouter);
 app.use('/api/startpage', startRouter);
+app.use('/api/user', userRouter);
+
 
 
 

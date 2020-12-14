@@ -14,9 +14,11 @@ router.get("/" , (req, res, next) => {
    PublicBooks.find()
    .populate("books")
    .then((allBooks) => {
-       console.log(allBooks)
-       res.status(200).json({allBooks})
+       res.status(200).json(allBooks)
+
+       
    })
+   .catch((err) => next(createError(err)))
 })
 
 module.exports = router
