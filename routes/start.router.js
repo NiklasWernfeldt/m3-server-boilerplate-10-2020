@@ -13,8 +13,10 @@ const {
 router.get("/" , (req, res, next) => {
    PublicBooks.find()
    .populate("books")
-   .then((allBooks) => {
-       res.status(200).json(allBooks)
+   .then((publicBooksListArr) => {
+     const bookList = publicBooksListArr[0];
+     const books = bookList.books;
+       res.status(200).json(books)
 
        
    })

@@ -19,7 +19,7 @@ router.get("/:id" , isLoggedIn, (req, res, next) => {
    .populate("author")
    .populate("pages")
    .then((book) => {
-       res.status(200).json({book: book})
+       res.status(200).json(book)
    })
    .catch((err)=>next(createError(err)))
 })
@@ -61,7 +61,7 @@ const {pagenr} = req.query
 })
 
 // GET ONE PAGE
-router.get("/:pageid", (req, res, next) => {
+router.get("/page/:pageid", (req, res, next) => {
     const {pageid} = req.params
     Page.findById(pageid)
     .then((page) => {
