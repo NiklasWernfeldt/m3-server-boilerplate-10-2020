@@ -9,7 +9,8 @@ const bookSchema = new Schema({
     earnedCash: {type: Number},
     coverImage: {type: String}, // change it to required
     pages: [{type: Schema.Types.ObjectId, ref: "Page"}],
-    author: {type: Schema.Types.ObjectId, ref: "User"} 
+    author: {type: Schema.Types.ObjectId, ref: "User"},
+    lastViewedPage: {type: Schema.Types.ObjectId, ref: "Page"} // added 
 }, {
   timestamps: {
     createdAt: 'created_at',

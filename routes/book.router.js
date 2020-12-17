@@ -6,11 +6,32 @@ const Page = require("./../models/page.model")
 const User = require("./../models/user.model")
 const PublicBooks = require("./../models/publicbooks.model")
 
+//require uploader, already exported from cloudinary-setup.js
+const uploader = require("./../config/cloudinary-setup");
+
 const {
     isLoggedIn,
     isNotLoggedIn,
     validationLogin
   } = require("../helpers/middlewares");
+
+  // include CLOUDINARY:
+//upload a single image per once.
+// ADD an horitzontal middleware
+router.post("/upload", uploader.single("image"), (req, res, next) => {
+  console.log("file is: ", req.file);
+
+  if (!req.file) {
+    next(new Error("No file uploaded!"));
+    return;
+  }
+  // get secure_url from the file object and save it in the
+  // variable 'secure_url', but this can be any name, just make sure you remember to use the same in frontend
+  res.json({ secure_url: req.file.secure_url });
+});
+
+
+
 
   // GET ONE BOOK
 router.get("/:id" , isLoggedIn, (req, res, next) => {
@@ -45,13 +66,14 @@ router.post("/create", isLoggedIn ,(req, res, next) => {
 // ON WRITE MODE THIS ROUTE CREATES  
 // A NEW PAGE AND ( THE EDIT BTN frontend navigates 
 // to write mode apge)
-router.post("/edit/:bookId", isLoggedIn ,(req, res, next) => {
+router.post("/createPage/:bookId", isLoggedIn ,(req, res, next) => {
   const { bookId} = req.params
 const {pagenr} = req.query
+console.log("req.body", req.body)
   const { text, pageImage } = req.body
   Page.create({pageNumber: pagenr, text, pageImage, book: bookId})
   .then((createdPage) => {
-
+   console.log("createdPage",createdPage)
     Book.findByIdAndUpdate(bookId, {$push: {pages: createdPage._id}}, {new: true})
     .then((updatedBook) => {
       res.status(200).json({updatedBook})
@@ -60,7 +82,9 @@ const {pagenr} = req.query
   })
 })
 
-// GET ONE PAGE
+
+
+// GET ONE PAGE // this URL has been changed (its not being called)
 router.get("/page/:pageid", (req, res, next) => {
     const {pageid} = req.params
     Page.findById(pageid)
@@ -72,6 +96,7 @@ router.get("/page/:pageid", (req, res, next) => {
 // UPDATES A PAGES TEXT AND PAGEIMAGE
 router.put("/editpage/:pageid", (req, res, next) => {
     const {pageid} = req.params
+    console.log(req.body)
     const {text, pageImage} = req.body
     Page.findByIdAndUpdate(pageid,{text, pageImage},{new: true})
     .then((updatedPage) => {
@@ -79,6 +104,8 @@ router.put("/editpage/:pageid", (req, res, next) => {
     })
     .catch((err) => next(createError(err)))
 })
+
+// req.body.page - just the page Nr 
 
 // UPLOADS A BOOK TO THE PUBLIC BOOK MODEL 
 router.post("/upload/:bookid", (req, res, next) => {
@@ -93,6 +120,8 @@ router.post("/upload/:bookid", (req, res, next) => {
   })
   .catch((err) => next(createError(err)))
 })
+
+
 
 module.exports = router
 
