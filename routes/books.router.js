@@ -3,6 +3,7 @@ const router = express.Router()
 const createError = require("http-errors")
 const User = require("./../models/user.model")
 const Book = require("./../models/book.model")
+const PublicBooks = require("./../models/publicbooks.model")
 
 const {
     isLoggedIn,
@@ -37,7 +38,7 @@ const {
 })
 
 // DELETES A BOOK
-router.delete("/:bookId", isLoggedIn, (req, res, next) => {
+router.delete("/delete/:bookId", isLoggedIn, (req, res, next) => {
     const {bookId} = req.params
     console.log("bookId",bookId)
     Book.findByIdAndDelete(bookId)
@@ -48,12 +49,22 @@ router.delete("/:bookId", isLoggedIn, (req, res, next) => {
 })
 
 // UPDATES A BOOKS INFORMATION AND COVER IMAGE
-router.put("/:id", isLoggedIn, (req, res, next) => {
+router.put("/updatebook/:id", isLoggedIn, (req, res, next) => {
     const {id} = req.params
     const {title, description, genre, coverImage} = req.body
     Book.findByIdAndUpdate(id, {title, description, genre, coverImage} ,{new: true} )
     .then((updatedBook) => {
         res.status(200).json({updatedBook})
+    })
+    .catch((err) => next(createError(err)))
+})
+
+router.get("/publicbooks", (req, res, next) => {
+    PublicBooks.find()
+    .populate("books")
+    .then((books) => {
+        console.log("books", books)
+        res.status(200).json(books)
     })
     .catch((err) => next(createError(err)))
 })

@@ -53,13 +53,27 @@ router.post("/create", isLoggedIn ,(req, res, next) => {
   const {title, description, genre, coverImage} = req.body
   const userId = req.session.currentUser._id
   Book.create({title, description, genre, coverImage, author: userId})
-  .then((createdBook) => {
-    User.findByIdAndUpdate(userId,{$push: {ownBooks: createdBook._id}, $set: {isAuthor: true} }, {new: true})
-    .then((updatedUser) => {
-      res.status(200).json({updatedUser})
+    .then((createdBook) => {
+      const pr = Page.create({ book: createdBook._id, pageNumber: 1, text: "" })
+      return pr;
     })
-  })
-  .catch((err)=>next(createError(err)))
+    .then((createdPage)=> {
+      const pr = Book.findByIdAndUpdate(
+        createdPage.book, 
+        { $push: {pages: createdPage._id } }
+      )
+
+      return pr
+    })
+    .then((updatedBook)=> {
+      const pr = User.findByIdAndUpdate(userId,{$push: {ownBooks: updatedBook._id}, $set: {isAuthor: true} }, {new: true})
+      return pr;
+    })
+    .then((updatedUser) => {
+        res.status(200).json({updatedUser}) // TODO remove wrapping object
+    })
+    .catch((err)=> next(createError(err)))
+
 })
 
 // THE EDIT BUTTON ON "MY BOOK VIEW" AND SAVE BUTTON 
@@ -68,10 +82,11 @@ router.post("/create", isLoggedIn ,(req, res, next) => {
 // to write mode apge)
 router.post("/createPage/:bookId", isLoggedIn ,(req, res, next) => {
   const { bookId} = req.params
-const {pagenr} = req.query
-console.log("req.body", req.body)
-  const { text, pageImage } = req.body
-  Page.create({pageNumber: pagenr, text, pageImage, book: bookId})
+  const {pagenr} = req.query
+  const { text, pageImage, pageNr } = req.body
+  console.log("pageNr", pageNr)
+  console.log("req.body", req.body)
+  Page.create({pageNumber: pageNr, text, pageImage, book: bookId})
   .then((createdPage) => {
    console.log("createdPage",createdPage)
     Book.findByIdAndUpdate(bookId, {$push: {pages: createdPage._id}}, {new: true})
@@ -81,6 +96,7 @@ console.log("req.body", req.body)
     
   })
 })
+
 
 
 
@@ -109,10 +125,11 @@ router.put("/editpage/:pageid", (req, res, next) => {
 
 // UPLOADS A BOOK TO THE PUBLIC BOOK MODEL 
 router.post("/upload/:bookid", (req, res, next) => {
+  console.log("uploadNewBook backend route")
   const {bookid} = req.params
   Book.findById(bookid)
   .then((foundBook) => {
-    PublicBooks.findByIdAndUpdate("5fd34386d7010c1e703b19d9", {$push: {books: foundBook._id}}, {new: true})
+    PublicBooks.updateMany({}, {$push: {books: foundBook._id}}, {new: true})
     .then((publishedBook) => {
       res.status(200).json({publishedBook})
     })
